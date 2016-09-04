@@ -2,14 +2,18 @@
 #define NINTENDO_POLYNOMIAL_H
 
 #include <vector>
+#include <string>
+
+#define REV(v) { reverse(v.begin(), v.end()); }
 
 using namespace std;
 
 class Polynomial {
+public:
     vector<bool> bits;
 
-public:
     // Constructors
+    Polynomial();
     Polynomial(unsigned long);
     Polynomial(vector<bool>);
     Polynomial(string);
@@ -20,7 +24,7 @@ public:
      * GF Operations
      */
     // Assignment
-    Polynomial operator=(const Polynomial &);
+    void operator=(const Polynomial &);
 
     // Addition
     Polynomial operator+=(const Polynomial &);
@@ -28,6 +32,20 @@ public:
 
     // Multiplication
     friend Polynomial operator*(const Polynomial &, const Polynomial &);
+    friend Polynomial operator^(const Polynomial &, int);
+    Polynomial square() const;
+    Polynomial sqrt() const;
+
+    // Division
+    friend pair<Polynomial, Polynomial> operator/(const Polynomial &, const Polynomial &);
+    friend Polynomial operator|(const Polynomial &, const Polynomial &);
+    friend Polynomial operator%(const Polynomial &, const Polynomial &);
+
+    // GCD
+    friend Polynomial gcd(const Polynomial &, const Polynomial &);
+
+    // Derivative
+    Polynomial derivative();
 
     // Shift
     Polynomial operator<<(int);
@@ -36,9 +54,17 @@ public:
     /******************************************************************************************************************/
 
     // Utilities
-    unsigned long get_degree() const;
-    string to_expr();
-    string to_bit_string();
+    friend bool operator==(const Polynomial &, const Polynomial &);
+    unsigned long degree() const;
+    unsigned long size() const { return bits.size(); }
+    static void bring_to_same_size(Polynomial*, Polynomial*);
+    static Polynomial ones(unsigned long);
+    bool is_zero() const;
+    bool is_one() const;
+    Polynomial copy() const;
+    Polynomial trim() const;
+    string to_expr() const;
+    string _b()const;
 };
 
 #endif //NINTENDO_POLYNOMIAL_H

@@ -34,9 +34,11 @@ string encode(vector<string> inputs)
     string ret = "";
     for(int i = 0; i < size / 16; i++) {
         string s = bitset<32>(b[i]).to_string();
-        reverse(s.begin(), s.end());
+        int SEMANTIC_OFFSET = 1;
+        reverse(s.begin() + SEMANTIC_OFFSET, s.end());
         ret += s;
     }
+    ret.erase(0, min(ret.find_first_not_of('0'), ret.size()-1));
 
     return ret;
 }
