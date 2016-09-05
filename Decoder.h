@@ -3,13 +3,18 @@
 
 #include "Polynomial.h"
 
+
 namespace Decoder {
-    using Degree = unsigned long;
-    using Factors = vector<pair<Polynomial, Degree>>;
+    using PolynomialWithDegree = pair<Polynomial, int>;
+    using Factors = vector<Polynomial>;
+    using FactorsWithDegree = vector<PolynomialWithDegree>;
+
 
     Polynomial SFF(Polynomial);
-    Factors DFF(Polynomial);
-    Factors EFF(Factors);
+    FactorsWithDegree DFF(Polynomial);
+    Factors EFF(FactorsWithDegree);
+
+    Factors FF(Polynomial);
 };
 
 

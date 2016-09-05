@@ -4,6 +4,8 @@
 
 #include "Polynomial.h"
 
+#define RAND_RANGE(min, max) { rand() % (max-min + 1) + min }
+
 using namespace std;
 using P = Polynomial;
 using ul = unsigned long;
@@ -22,10 +24,6 @@ Polynomial::Polynomial(string bitstring) {
 }
 
 // GF operations
-void Polynomial::operator=(const Polynomial &other) {
-    this->bits = other.bits;
-}
-
 Polynomial Polynomial::operator<<(int offset) {
     rotate(bits.begin(), bits.begin() + offset, bits.end());
     for (ul i = 0; i < offset; i++)
@@ -40,16 +38,19 @@ Polynomial Polynomial::operator>>(int offset) {
     return *this;
 }
 
-P operator+(P &p1, const P &p2) {
-    return p1 += p2;
+P Polynomial::operator+=(const P &other) {
+    return *this + other;
 }
 
-P Polynomial::operator+=(const P &other) {
-    ul size = bits.size();
-    assert(size == other.size());
+P operator+(P &_a, const P &_b) {
+//    return p1 += p2;
+    P a = _a.copy(), b = _b.copy();
+    P::bring_to_same_size(&a, &b);
+    ul size = a.bits.size();
+    assert(size == b.size());
     for (int i = 0; i < size; i++)
-        bits[i] = bits[i] != other.bits[i];
-    return *this;
+        a.bits[i] = a.bits[i] != b.bits[i];
+    return a;
 }
 
 P operator*(const P &_a, const P &_b) {
@@ -63,7 +64,16 @@ P operator*(const P &_a, const P &_b) {
         for (int j = 0; j < size; j++)
             result.bits[i + j + 1] = result.bits[i + j + 1] != (a.bits[i] && b.bits[j]);
 
-    return result.trim();
+    return result.monic();
+}
+
+P operator^(const P &p, int exponent) {
+    P ret = p.copy();
+    if (exponent == 0)
+        return P::ones(p.degree());
+    for (int i = 1; i < exponent; i++)
+        ret = ret * ret;
+    return ret;
 }
 
 P Polynomial::square() const {
@@ -82,8 +92,10 @@ P Polynomial::sqrt() const {
     return P(accu);
 }
 
-pair<P, P> operator/(const P &_a, const P &_b) {
-    P a = _a.copy(), b = _b.copy();
+pair<P, P> operator/(const P &_a, const P &b) {
+    if (_a.degree() < b.degree())
+        return b / _a;
+    P a = _a.copy();
     ul m = a.degree(), n = b.degree();
     V u = a.bits, v = b.bits, q(m - n + 1);
     auto monic = v[0];
@@ -109,7 +121,7 @@ P operator%(const P &a, const P &b) {
 };
 
 P gcd(const P &a, const P &b) {
-    P u = a.trim(), v = b.trim();
+    P u = a.monic(), v = b.monic();
     if (v.is_zero()) return u;
     return gcd(v, u % v);
 }
@@ -128,6 +140,10 @@ ul Polynomial::degree() const {
     return 0;
 }
 
+bool operator==(const P &a, string s) {
+    return a._b() == s;
+}
+
 bool Polynomial::is_zero() const {
     for (auto b : bits)
         if (b) return false;
@@ -140,15 +156,6 @@ bool Polynomial::is_one() const {
     return bits[bits.size() - 1];
 }
 
-bool operator==(const P &a, const P &b) {
-    if (a.degree() != b.degree())
-        return false;
-    for (int i = 0; i < a.size(); i++)
-        if (a.bits[i] != b.bits[i])
-            return false;
-    return true;
-}
-
 P Polynomial::copy() const {
     P ret(bits.size());
     std::copy(bits.begin(), bits.end(), ret.bits.begin());
@@ -156,10 +163,10 @@ P Polynomial::copy() const {
 }
 
 string Polynomial::_b() const {
+    P p = this->monic();
     string ret = "";
-    for (auto b : bits)
-        ret += b ? '1' : '0';
-    ret.erase(0, min(ret.find_first_not_of('0'), ret.size()-1));
+    for (auto b : p.bits)
+        ret += b ? '1':'0';
     return ret;
 }
 
@@ -176,10 +183,12 @@ string Polynomial::to_expr() const {
     return expr;
 }
 
-P Polynomial::trim() const {
+P Polynomial::monic() const {
     ul start = 0;
     for (; start < bits.size(); start++) if (bits[start]) break;
     V new_bits(bits.begin() + start, bits.end());
+    if (new_bits.size() == 0)
+        new_bits.push_back(0);
     return P(new_bits);
 }
 
@@ -188,15 +197,6 @@ P Polynomial::ones(ul n) {
     for (int i = 0; i < n; i++)
         accu += '1';
     return P(accu);
-}
-
-P operator^(const P &p, int exponent) {
-    P ret = p.copy();
-    if (exponent == 0)
-        return P::ones(p.degree());
-    for (int i = 1; i < exponent; i++)
-        ret = ret * ret;
-    return ret;
 }
 
 void Polynomial::bring_to_same_size(P *a, P *b) {
@@ -209,6 +209,17 @@ void Polynomial::bring_to_same_size(P *a, P *b) {
             b->bits.push_back(0);
         REV(b->bits);
     }
+}
+
+Polynomial Polynomial::generate_random(int min_degree, int max_degree) {
+    // Random degree
+    int degree = RAND_RANGE(min_degree, max_degree);
+    // Random bits
+    vector<bool> bits;
+    bits.push_back(1); // always monic
+    for (int i = 1; i < degree; i++)
+        bits.push_back((bool) (rand() % 2));
+    return Polynomial(bits);
 }
 
 

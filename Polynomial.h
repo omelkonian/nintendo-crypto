@@ -23,9 +23,6 @@ public:
     /**
      * GF Operations
      */
-    // Assignment
-    void operator=(const Polynomial &);
-
     // Addition
     Polynomial operator+=(const Polynomial &);
     friend Polynomial operator+(Polynomial &, const Polynomial &);
@@ -54,7 +51,8 @@ public:
     /******************************************************************************************************************/
 
     // Utilities
-    friend bool operator==(const Polynomial &, const Polynomial &);
+    static Polynomial generate_random(int, int);
+    friend bool operator==(const Polynomial &, string);
     unsigned long degree() const;
     unsigned long size() const { return bits.size(); }
     static void bring_to_same_size(Polynomial*, Polynomial*);
@@ -62,7 +60,7 @@ public:
     bool is_zero() const;
     bool is_one() const;
     Polynomial copy() const;
-    Polynomial trim() const;
+    Polynomial monic() const;
     string to_expr() const;
     string _b()const;
 };
