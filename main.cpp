@@ -45,6 +45,11 @@ int main() {
     string expected = encode({"10110000110000010101001011111001", "11101011111100101000001100011111"});
     EQ(actual, expected);
 
+    srand(time(NULL));
+    auto ffs = Decoder::EFF({pair<P, int>(P("1110110111110001000010100110001010000000010001111110111001100110"), 8)});
+    EQ(ffs[0]._b(), "101011111");
+    EQ(ffs[1]._b(), "100011101");
+
     // Multiplication
     P a("000001"), b("101011");
     P mul = a * b;
@@ -79,11 +84,9 @@ int main() {
 
     EQ(Decoder::SFF(P("101101111"))._b(), "1111001");
 
-    for (auto f : Decoder::EFF({pair<P, int>(P("10100010000101011"), 8)}))
-        cout << f._b() << " ";
-    cout << endl;
-
-    srand(time(NULL));
+    auto fs = Decoder::EFF({pair<P, int>(P("10100010000101011"), 8)});
+    EQ(fs[0]._b(), "101011111");
+    EQ(fs[1]._b(), "100011101");
 
     cout << "================= PASSED =================" << endl;
 
