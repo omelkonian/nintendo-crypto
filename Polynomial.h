@@ -59,10 +59,11 @@ public:
     static Polynomial ones(unsigned long);
     bool is_zero() const;
     bool is_one() const;
+    bool is_monic() const;
     Polynomial copy() const;
-    Polynomial monic() const;
+    Polynomial monic();
     string to_expr() const;
-    string _b()const;
+    string _b() const;
 };
 
 #endif //NINTENDO_POLYNOMIAL_H

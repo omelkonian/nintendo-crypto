@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <cassert>
 #include "Decoder.h"
 
 #define APPEND(a, b) { a.insert(a.end(), b.begin(), b.end()); }
@@ -44,10 +45,42 @@ namespace Decoder {
             accu = accu * factors[i];
         return accu;
     }
-
-    FactorsWithDegree DFF(Polynomial) {
-        return Decoder::FactorsWithDegree();
+    FactorsWithDegree DDF(Polynomial A) {
+        FactorsWithDegree fs;
+        P p("100");
+        int d = 1;
+        while (A.degree() > 0) {
+            P T = gcd(p + Polynomial("10"), A);
+            if (!T.is_one())
+                fs.push_back(PolynomialWithDegree(T, d));
+            A = A | T;
+            d++;
+            p = p.square() % A;
+        }
+        return fs;
     }
+//    FactorsWithDegree DDF(P f) {
+//        FactorsWithDegree result = {};
+//        P fs = f.copy();
+//        int i = 1;
+//        P x = P(vector<bool>{1, 0});
+//        while (fs.degree() >= 2*i) {
+//            P rotx = P(vector<bool>{1});
+//            for (int j = 0; j < (1 << i); j++)
+//                rotx.bits.push_back(0);
+//            auto aa = rotx + x;
+//            P g = gcd(fs, aa % fs);
+//            if (!(g == string("1"))) {
+//                result.push_back({g, i});
+//                auto div = fs / g;
+//                assert(div.second == "0");
+//                fs = div.first;
+//            }
+//            i++;
+//        }
+//        result.push_back({NULL, 1});
+//        return result;
+//    }
 
     Factors _EFF(P A, int d) {
         if (A.degree() == d)
@@ -77,6 +110,6 @@ namespace Decoder {
     }
 
     Factors FF(Polynomial p) {
-        return EFF(DFF(SFF(p)));
+        return EFF(DDF(SFF(p)));
     }
 }

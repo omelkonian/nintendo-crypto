@@ -1,5 +1,5 @@
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 #include <algorithm>
 
 #include "Polynomial.h"
@@ -12,11 +12,14 @@ using ul = unsigned long;
 using V = vector<bool>;
 
 // Constructors
-Polynomial::Polynomial() {
+Polynomial::Polynomial() : bits(V({0})) {
 }
 Polynomial::Polynomial(ul size) : bits(V(size)) {}
 
-Polynomial::Polynomial(V bits) : bits(bits) {}
+Polynomial::Polynomial(V bits) : bits(bits) {
+    if (bits.size() == 0)
+        this->bits.push_back(0);
+}
 
 Polynomial::Polynomial(string bitstring) {
     for (auto c : bitstring)
@@ -28,6 +31,7 @@ Polynomial Polynomial::operator<<(int offset) {
     rotate(bits.begin(), bits.begin() + offset, bits.end());
     for (ul i = 0; i < offset; i++)
         bits[bits.size() - 1 - i] = false;
+    monic();
     return *this;
 }
 
@@ -35,11 +39,12 @@ Polynomial Polynomial::operator>>(int offset) {
     REV(bits);
     *this << offset;
     REV(bits);
+    monic();
     return *this;
 }
 
 P Polynomial::operator+=(const P &other) {
-    return *this + other;
+    return (*this + other).monic();
 }
 
 P operator+(P &_a, const P &_b) {
@@ -50,7 +55,7 @@ P operator+(P &_a, const P &_b) {
     assert(size == b.size());
     for (int i = 0; i < size; i++)
         a.bits[i] = a.bits[i] != b.bits[i];
-    return a;
+    return a.monic();
 }
 
 P operator*(const P &_a, const P &_b) {
@@ -73,7 +78,7 @@ P operator^(const P &p, int exponent) {
         return P::ones(p.degree());
     for (int i = 1; i < exponent; i++)
         ret = ret * ret;
-    return ret;
+    return ret.monic();
 }
 
 P Polynomial::square() const {
@@ -82,14 +87,14 @@ P Polynomial::square() const {
         accu.push_back(0);
         accu.push_back(b);
     }
-    return P(accu);
+    return P(accu).monic();
 }
 
 P Polynomial::sqrt() const {
     auto accu = V();
     for (ul i = 0; i < bits.size(); i+=2)
         accu.push_back(bits[i]);
-    return P(accu);
+    return P(accu).monic();
 }
 
 pair<P, P> operator/(const P &_a, const P &b) {
@@ -109,7 +114,7 @@ pair<P, P> operator/(const P &_a, const P &b) {
     for (ul i = 0; i < r.size(); i++)
         r[i] = u[m - r.size() + 1 + i];
 
-    return pair<P, P>(P(q), P(r));
+    return pair<P, P>(P(q).monic(), P(r).monic());
 }
 
 P operator|(const P &a, const P &b) {
@@ -121,9 +126,12 @@ P operator%(const P &a, const P &b) {
 };
 
 P gcd(const P &a, const P &b) {
-    P u = a.monic(), v = b.monic();
-    if (v.is_zero()) return u;
-    return gcd(v, u % v);
+    if (a.degree() < b.degree())
+        return gcd(b, a);
+    assert(a.is_monic());
+    assert(b.is_monic());
+    if (b.is_zero()) return a;
+    return gcd(b, a % b);
 }
 
 P Polynomial::derivative() {
@@ -156,6 +164,10 @@ bool Polynomial::is_one() const {
     return bits[bits.size() - 1];
 }
 
+bool Polynomial::is_monic() const {
+    return bits[0] == 1 || bits.size() == 1;
+}
+
 P Polynomial::copy() const {
     P ret(bits.size());
     std::copy(bits.begin(), bits.end(), ret.bits.begin());
@@ -163,9 +175,9 @@ P Polynomial::copy() const {
 }
 
 string Polynomial::_b() const {
-    P p = this->monic();
     string ret = "";
-    for (auto b : p.bits)
+//    assert(is_monic());
+    for (auto b : bits)
         ret += b ? '1':'0';
     return ret;
 }
@@ -183,13 +195,12 @@ string Polynomial::to_expr() const {
     return expr;
 }
 
-P Polynomial::monic() const {
-    ul start = 0;
-    for (; start < bits.size(); start++) if (bits[start]) break;
-    V new_bits(bits.begin() + start, bits.end());
-    if (new_bits.size() == 0)
-        new_bits.push_back(0);
-    return P(new_bits);
+P Polynomial::monic() {
+    bits.erase(bits.begin(), find(bits.begin(), bits.end(), 1));
+    if (bits.empty())
+        bits.push_back(0);
+    assert(is_monic());
+    return *this;
 }
 
 P Polynomial::ones(ul n) {
