@@ -32,12 +32,8 @@ string encode(vector<string> inputs)
 
     // Un-permutate
     string ret = "";
-    for(int i = 0; i < size / 16; i++) {
-        string s = bitset<32>(b[i]).to_string();
-        int SEMANTIC_OFFSET = 1;
-        reverse(s.begin() + SEMANTIC_OFFSET, s.end());
-        ret += s;
-    }
+    for(int i = size / 16 - 1; i >= 0; i--)
+        ret += bitset<32>(b[i]).to_string();;
     ret.erase(0, min(ret.find_first_not_of('0'), ret.size()-1));
 
     return ret;
