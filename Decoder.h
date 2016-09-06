@@ -10,10 +10,9 @@ namespace Decoder {
     using FactorsWithDegree = vector<PolynomialWithDegree>;
 
 
-    vector<Polynomial> _SFF(Polynomial);
     Polynomial SFF(Polynomial);
     FactorsWithDegree DDF(Polynomial);
-    Factors EFF(FactorsWithDegree);
+    Factors EDF(FactorsWithDegree);
 
     Factors FF(Polynomial);
 };

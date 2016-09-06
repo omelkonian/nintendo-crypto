@@ -1,6 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cassert>
+
 #include "Decoder.h"
 
 #define APPEND(a, b) { a.insert(a.end(), b.begin(), b.end()); }
@@ -82,7 +83,7 @@ namespace Decoder {
 //        return result;
 //    }
 
-    Factors _EFF(P A, int d) {
+    Factors _EDF(P A, int d) {
         if (A.degree() == d)
             return {A};
         for (;;) {
@@ -94,22 +95,22 @@ namespace Decoder {
             }
             P U = gcd(A, W);
             if (U.degree() > 0 && U.degree() < A.degree()) {
-                Factors f1 = _EFF(U, d);
-                Factors f2 = _EFF(A | U, d);
+                Factors f1 = _EDF(U, d);
+                Factors f2 = _EDF(A | U, d);
                 APPEND(f1, f2);
                 return f1;
             }
         }
     }
-    Factors EFF(FactorsWithDegree fs) {
+    Factors EDF(FactorsWithDegree fs) {
         Factors ret;
         for (PolynomialWithDegree f : fs)
-            for (P ff: _EFF(f.first, f.second))
+            for (P ff: _EDF(f.first, f.second))
                 ret.push_back(ff);
         return ret;
     }
 
     Factors FF(Polynomial p) {
-        return EFF(DDF(SFF(p)));
+        return EDF(DDF(SFF(p)));
     }
 }
