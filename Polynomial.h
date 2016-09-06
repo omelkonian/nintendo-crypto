@@ -25,7 +25,7 @@ public:
      */
     // Addition
     Polynomial operator+=(const Polynomial &);
-    friend Polynomial operator+(Polynomial &, const Polynomial &);
+    friend Polynomial operator+(const Polynomial &, const Polynomial &);
 
     // Multiplication
     friend Polynomial operator*(const Polynomial &, const Polynomial &);

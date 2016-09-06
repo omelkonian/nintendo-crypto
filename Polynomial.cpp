@@ -47,8 +47,7 @@ P Polynomial::operator+=(const P &other) {
     return (*this + other).monic();
 }
 
-P operator+(P &_a, const P &_b) {
-//    return p1 += p2;
+P operator+(const P &_a, const P &_b) {
     P a = _a.copy(), b = _b.copy();
     P::bring_to_same_size(&a, &b);
     ul size = a.bits.size();
@@ -228,9 +227,9 @@ Polynomial Polynomial::generate_random(int min_degree, int max_degree) {
     // Random bits
     vector<bool> bits;
     bits.push_back(1); // always monic
-    for (int i = 1; i < degree; i++)
+    for (int i = 0; i < degree; i++)
         bits.push_back((bool) (rand() % 2));
-    return Polynomial(bits);
+    return Polynomial(bits).monic();
 }
 
 
