@@ -30,7 +30,7 @@ else cout << test_count++ << " ";
 
 #define DIV(x, y, q, r) { EQ((P(x) | P(y))._b(), q); EQ((P(x) % P(y))._b(), r) }
 
-#define LOOP_COUNT 500
+#define LOOP_COUNT 10
 #define LOOP for (int i = 0; i < LOOP_COUNT; i++)
 
 #define RED "\033[1;31m"
@@ -89,6 +89,7 @@ int main() {
     cout << endl << endl << GREEN << "GCD: " << RESET;
     EQ(gcd(P("101101"), P("1010"))._b(), "101");
     EQ(gcd(P("101011"), P("1010"))._b(), "11");
+    EQ(gcd(P("101101111"), P("10101"))._b(), "10101");
 
     cout << endl << endl << GREEN << "Derivative: " << RESET;
     EQ(P("101101111").derivative()._b(), "10101");
@@ -100,8 +101,9 @@ int main() {
     EQ(P("10100").sqrt()._b(), "110");
 
     cout << endl << endl << GREEN << "SFF: " << RESET;
-    EQ(gcd(P("101101111"), P("10101"))._b(), "10101");
-    EQ(Decoder::SFF(P("101101111"))._b(), "1111001");
+    Factors fs = Decoder::SFF(P("101101111"));
+    EQ(fs[1]._b(), "10011")
+    EQ(fs[2]._b(), "111")
 
     cout << endl << endl << GREEN << "DDF: " << RESET;
     /*auto akdfj = P(vector<bool>{true});
@@ -110,10 +112,10 @@ int main() {
     auto aaa = P("101") * P("101");*/
 
     cout << endl << endl << GREEN << "EDF: " << RESET;
-    srand(1);
+    /*srand(1);
     auto fs = Decoder::EDF({pair<P, int>(P("10100010000101011"), 8)});
     EQ(fs[0]._b(), "101011111");
-    EQ(fs[1]._b(), "100011101");
+    EQ(fs[1]._b(), "100011101");*/
 
     cout << endl << endl << "================================================================================================" << RESET << endl;
     cout << "\t\t\t PASSED" << endl;
@@ -178,6 +180,13 @@ void random_tests() {
     }
 
     cout << endl << endl << GREEN << "SFF: " << RESET;
+    /*LOOP {
+        P r = P::generate_random(3, 3);
+        P A = r.square();
+        auto res = Decoder::SFF(A);
+        EQ(res[1]._b(), "1");
+        EQ(res[2]._b(), r._b());
+    }*/
 
     cout << endl << endl << GREEN << "DDF: " << RESET;
 

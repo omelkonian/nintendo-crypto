@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include "Decoder.h"
+#include "Factors.h"
 
 #define APPEND(a, b) { a.insert(a.end(), b.begin(), b.end()); }
 
@@ -11,42 +12,28 @@ using P = Polynomial;
 using ul = unsigned long;
 
 namespace Decoder {
-    vector<P> _SFF(P f) {
-        int i = 1;
-        P R = Polynomial("1");
-        P g = f.derivative();
-        if (!g.is_zero()) {
-            P c = gcd(f, g);
-            P w = f | c;
-            while (!w.is_one()) {
-                P y = gcd(w, c);
-                P z = w | y;
-                P z_exp = z ^ i++;
-                R = R * z_exp;
-                w = y;
-                c = c | y;
-            }
-            if (!c.is_one()) {
-                c = c.sqrt();
-                vector<P> result = _SFF(c);
-                result.insert(result.begin(), R);
-                return result;
-            } else
-                return {R};
+    Factors SFF(P f) {
+        ul n = f.degree();
+        if (n == 0)
+            return Factors();
+        P g = gcd(f, f.derivative());
+        assert(g.degree() <= n);
+        Factors hs = SFF(g.sqrt());
+        int m = (int) hs.size();
+        assert(2 * m == g.degree());
+        P h = f | g;
+        Factors ret = Factors(n);
+        for (int i = m; i >= 1; i--) {
+            int index1 = 2 * i, index2 = index1 + 1;
+            ret[index2] = gcd(hs[i], h);
+            ret[index1] = hs[i] | ret[index2];
+            h = h | ret[index2];
         }
-        else {
-            f = f.sqrt();
-            return _SFF(f);
-        }
+        ret[1] = h;
+        return ret;
     }
-    P SFF(P f) {
-        vector<P> factors = _SFF(f);
-        P accu = factors[0];
-        for (unsigned long i = 1; i < factors.size(); i++)
-            accu = accu * factors[i];
-        return accu;
-    }
-    FactorsWithDegree DDF(Polynomial A) {
+
+    /*FactorsWithDegree DDF(Polynomial A) {
         FactorsWithDegree fs;
         P p("100");
         int d = 1;
@@ -59,7 +46,7 @@ namespace Decoder {
             p = p.square() % A;
         }
         return fs;
-    }
+    }*/
 //    FactorsWithDegree DDF(P f) {
 //        FactorsWithDegree result = {};
 //        P fs = f.copy();
@@ -83,7 +70,7 @@ namespace Decoder {
 //        return result;
 //    }
 
-    Factors _EDF(P A, int d) {
+    /*Factors _EDF(P A, int d) {
         if (A.degree() == d)
             return {A};
         for (;;) {
@@ -112,5 +99,5 @@ namespace Decoder {
 
     Factors FF(Polynomial p) {
         return EDF(DDF(SFF(p)));
-    }
+    }*/
 }

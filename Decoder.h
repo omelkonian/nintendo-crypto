@@ -2,17 +2,13 @@
 #define NINTENDO_DECODER_H
 
 #include "Polynomial.h"
+#include "Factors.h"
 
 
 namespace Decoder {
-    using PolynomialWithDegree = pair<Polynomial, int>;
-    using Factors = vector<Polynomial>;
-    using FactorsWithDegree = vector<PolynomialWithDegree>;
-
-
-    Polynomial SFF(Polynomial);
-    FactorsWithDegree DDF(Polynomial);
-    Factors EDF(FactorsWithDegree);
+    Factors SFF(Polynomial);
+    Factors DDF(Polynomial);
+    Factors EDF(Polynomial, int degree);
 
     Factors FF(Polynomial);
 };
