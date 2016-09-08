@@ -1,6 +1,7 @@
 #ifndef NINTENDO_FACTORS_H
 #define NINTENDO_FACTORS_H
 
+#define APPEND(a, b) { a.insert(a.end(), b.begin(), b.end()); }
 
 #include <algorithm>
 #include "Polynomial.h"
@@ -17,6 +18,11 @@ public:
 
     Factors operator*=(Polynomial p) {
         factors.push_back(p);
+        return *this;
+    }
+
+    Factors operator+(Factors other) {
+        APPEND(this->factors, other.factors)
         return *this;
     }
 

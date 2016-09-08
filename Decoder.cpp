@@ -33,44 +33,22 @@ namespace Decoder {
         return ret;
     }
 
-    /*FactorsWithDegree DDF(Polynomial A) {
-        FactorsWithDegree fs;
+    Factors DDF(Polynomial A) {
+        Factors fs;
         P p("100");
         int d = 1;
         while (A.degree() > 0) {
             P T = gcd(p + Polynomial("10"), A);
             if (!T.is_one())
-                fs.push_back(PolynomialWithDegree(T, d));
+                fs *= T;
             A = A | T;
             d++;
             p = p.square() % A;
         }
         return fs;
-    }*/
-//    FactorsWithDegree DDF(P f) {
-//        FactorsWithDegree result = {};
-//        P fs = f.copy();
-//        int i = 1;
-//        P x = P(vector<bool>{1, 0});
-//        while (fs.degree() >= 2*i) {
-//            P rotx = P(vector<bool>{1});
-//            for (int j = 0; j < (1 << i); j++)
-//                rotx.bits.push_back(0);
-//            auto aa = rotx + x;
-//            P g = gcd(fs, aa % fs);
-//            if (!(g == string("1"))) {
-//                result.push_back({g, i});
-//                auto div = fs / g;
-//                assert(div.second == "0");
-//                fs = div.first;
-//            }
-//            i++;
-//        }
-//        result.push_back({NULL, 1});
-//        return result;
-//    }
+    }
 
-    /*Factors _EDF(P A, int d) {
+    Factors EDF(P A, int d) {
         if (A.degree() == d)
             return {A};
         for (;;) {
@@ -78,26 +56,18 @@ namespace Decoder {
             P W = T;
             for (int i = 0; i < d -1; i++) {
                 T = T.square() % A;
-                W += T;
+                W += &T;
             }
             P U = gcd(A, W);
             if (U.degree() > 0 && U.degree() < A.degree()) {
-                Factors f1 = _EDF(U, d);
-                Factors f2 = _EDF(A | U, d);
-                APPEND(f1, f2);
-                return f1;
+                Factors f1 = EDF(U, d);
+                Factors f2 = EDF(A | U, d);
+                return  f1 + f2;
             }
         }
     }
-    Factors EDF(FactorsWithDegree fs) {
-        Factors ret;
-        for (PolynomialWithDegree f : fs)
-            for (P ff: _EDF(f.first, f.second))
-                ret.push_back(ff);
-        return ret;
-    }
 
-    Factors FF(Polynomial p) {
+    /*Factors FF(Polynomial p) {
         return EDF(DDF(SFF(p)));
     }*/
 }

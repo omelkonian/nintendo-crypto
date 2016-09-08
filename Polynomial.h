@@ -24,7 +24,7 @@ public:
      * GF Operations
      */
     // Addition
-    Polynomial operator+=(const Polynomial &);
+    Polynomial operator+=(Polynomial*);
     friend Polynomial operator+(const Polynomial &, const Polynomial &);
 
     // Multiplication
@@ -64,6 +64,7 @@ public:
     Polynomial monic();
     string to_expr() const;
     string _b() const;
+    string _bW(unsigned long) const;
 };
 
 #endif //NINTENDO_POLYNOMIAL_H

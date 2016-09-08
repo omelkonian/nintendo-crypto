@@ -43,8 +43,13 @@ Polynomial Polynomial::operator>>(int offset) {
     return *this;
 }
 
-P Polynomial::operator+=(const P &other) {
-    return (*this + other).monic();
+P Polynomial::operator+=(P* other) {
+    P::bring_to_same_size(this, other);
+    ul size = this->bits.size();
+    assert(size == other->size());
+    for (int i = 0; i < size; i++)
+        this->bits[i] = this->bits[i] != other->bits[i];
+    return this->monic();
 }
 
 P operator+(const P &_a, const P &_b) {
@@ -181,12 +186,33 @@ string Polynomial::_b() const {
     return ret;
 }
 
+template<const unsigned num, const char separator>
+void separate(std::string & input)
+{
+    for ( auto it = input.begin(); (num+1) <= std::distance(it, input.end()); ++it )
+    {
+        std::advance(it,num);
+        it = input.insert(it,separator);
+    }
+}
+
+string Polynomial::_bW(ul size) const {
+    string ret = "";
+    for (auto b : bits)
+        ret += b ? '1':'0';
+    ul fill = size - ret.size();
+    ret = string(fill, '0').append(ret);
+    separate<32, ' '>(ret);
+    separate<132, '\n'>(ret);
+    return ret;
+}
+
 string Polynomial::to_expr() const {
     string expr = "";
     ul exponent = bits.size() - 1;
     for (auto b : bits) {
         if (exponent == 0)
-            expr += b;
+            expr += b ? "1":"0";
         else
             expr += (b ? ("x^" + to_string(exponent) + " + ") : "");
         exponent--;

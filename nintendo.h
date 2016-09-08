@@ -6,35 +6,63 @@
 #include <algorithm>
 
 using namespace std;
+using ul = unsigned long;
 
-string encode(vector<string> inputs)
+string bring_to_size(string s, int size) {
+    ul fill = size - s.size();
+    return string(fill, '0').append(s);
+}
+
+string encode(string s1, string s2)
 {
-    int size = (int) (inputs.size() * 16);
+    ul siz = max(s1.size(), s2.size());
+    int size = (siz <= 32) ? 32 : ((siz <= 64) ? 64 : (siz <= 128) ? 128 : 256);
 
-    unsigned int* a = new unsigned int[size / 16]; // <- input tab to encrypt
-    unsigned int* b = new unsigned int[size / 16]; // <- output tab
+    // Bring strings to <size>
+    s1 = bring_to_size(s1, size);
+    s2 = bring_to_size(s2, size);
 
-    for (int i = 0; i < size / 16; i++) {   // Read size / 16 integers to a
+    vector<string> inputs;
+    for (ul i = 0; i < size / 32; i++)
+        inputs.push_back(s1.substr(i * 32, 32));
+    for (ul i = 0; i < size / 32; i++)
+        inputs.push_back(s2.substr(i * 32, 32));
+
+    cout << "\nIN\n"; for (string s : inputs) cout << s << " "; cout << endl;
+
+    unsigned int* a = new unsigned int[size / 16];
+    unsigned int* b = new unsigned int[size / 16];
+
+    for (int i = 0; i < size / 16; i++) {
         stringstream ss;
         ss << hex << bitset<32>(inputs[i]).to_ulong();
         ss >> a[i];
     }
 
-    for (int i = 0; i < size / 16; i++) {   // Write size / 16 zeros to b
+    for (int i = 0; i < size / 16; i++)
         b[i] = 0;
-    }
 
     for (int i = 0; i < size; i++)
-        for (int j = 0; j < size; j++) {
-            b[(i + j) / 32] ^= ( (a[i / 32] >> (i % 32)) &
-                                 (a[j / 32 + size / 32] >> (j % 32)) & 1 ) << ((i + j) % 32);   // Magic centaurian operation
-        }
+        for (int j = 0; j < size; j++)
+            b[(i + j) / 32] ^= ((a[i / 32] >> (i % 32)) & (a[j / 32 + size / 32] >> (j % 32)) & 1) << ((i + j) % 32);   // Magic centaurian operation
 
     // Un-permutate
+    vector<string> accu;
+    for(int i = 0; i < size / 16/* - 1*/; i++)
+        accu.push_back(bitset<32>(b[i]).to_string());
+//    for (int i = 0; i < accu.size(); i += 2)
+//        iter_swap(accu.begin() + i, accu.begin() + i + 1);
     string ret = "";
-    for(int i = size / 16 - 1; i >= 0; i--)
-        ret += bitset<32>(b[i]).to_string();;
-    ret.erase(0, min(ret.find_first_not_of('0'), ret.size()-1));
+    int count = 1;
+    for (string s : accu) {
+        ret += s + " ";
+        count++;
+        if (count > 4) {
+            ret += "\n ";
+            count = 1;
+        }
+    }
+//    ret.erase(0, min(ret.find_first_of('1'), ret.size()-1));
 
     return ret;
 }
