@@ -48,8 +48,6 @@ void random_tests();
 void tests();
 
 int main() {
-    cout << 8 * sizeof(unsigned long long) << endl;
-
     int size;
     string encrypted;
 

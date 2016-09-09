@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cassert>
+#include <string>
 #include <algorithm>
 
 #include "Polynomial.h"
