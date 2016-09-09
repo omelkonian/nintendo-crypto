@@ -66,8 +66,4 @@ namespace Decoder {
             }
         }
     }
-
-    /*Factors FF(Polynomial p) {
-        return EDF(DDF(SFF(p)));
-    }*/
 }

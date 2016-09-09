@@ -50,8 +50,6 @@ string encode(string s1, string s2)
     vector<string> accu;
     for(int i = 0; i < size / 16/* - 1*/; i++)
         accu.push_back(bitset<32>(b[i]).to_string());
-//    for (int i = 0; i < accu.size(); i += 2)
-//        iter_swap(accu.begin() + i, accu.begin() + i + 1);
     string ret = "";
     int count = 1;
     for (string s : accu) {
@@ -62,7 +60,6 @@ string encode(string s1, string s2)
             count = 1;
         }
     }
-//    ret.erase(0, min(ret.find_first_of('1'), ret.size()-1));
 
     return ret;
 }
