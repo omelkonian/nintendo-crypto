@@ -2,4 +2,4 @@
 Solution to the the Nintendo Crypto-Challenge
 
 # Resources
-https://www.dropbox.com/sh/p7mdhrotwl404ek/AAClMvYQpTtvx8wl4B8daux8a?dl=0
+https://drive.google.com/open?id=0B9UHshAIN5rZVjFTS1lrQVJUdm8
